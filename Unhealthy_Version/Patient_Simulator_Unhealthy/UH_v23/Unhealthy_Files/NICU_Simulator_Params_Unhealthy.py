@@ -267,8 +267,8 @@ class NeonateSimulator:
             )
             i = 0
             while i < self.num_intervals:
-                # With a 4% chance at each interval, initiate a spike event
-                if np.random.rand() < 0.04:
+                # With a 15% chance at each interval, initiate a spike event
+                if np.random.rand() < 0.15:
                     # Choose spike duration of 3 or 4 intervals (ensuring we don't exceed bounds)
                     spike_duration = np.random.choice([3, 4])
                     spike_duration = min(spike_duration, self.num_intervals - i)
@@ -322,7 +322,7 @@ class NeonateSimulator:
                 max_val=210, 
                 sequence_output=True
             )
-            self.synthetic_heart_rate_data = gaussian_filter1d(self.synthetic_heart_rate_data, sigma=0.4)
+            self.synthetic_heart_rate_data = gaussian_filter1d(self.synthetic_heart_rate_data, sigma=0.1)
         else:
             print("Healthy mode selected")
             self.synthetic_heart_rate_data = generate_synthetic_data(
