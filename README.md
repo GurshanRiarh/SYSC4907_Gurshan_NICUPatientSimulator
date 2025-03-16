@@ -21,6 +21,6 @@ JSON Files: Contains patient data with timestamps and all data.
 CSV Files: Logs generated heart rate, respiratory rate, body temperature, and intervention data.
 Plots: Visualizations for vital sign trends over the shift.
 
-Contributors
-Gurshan Riarh
+Contributors: 
+Gurshan Riarh,
 Jesse Levine
