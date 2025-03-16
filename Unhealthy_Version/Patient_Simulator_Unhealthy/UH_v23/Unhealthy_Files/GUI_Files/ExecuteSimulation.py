@@ -15,6 +15,8 @@ import sys
 import os
 import zipfile
 import io
+import webbrowser
+from threading import Timer
 
 # =============================================================================
 # Directory Setup and Path Insertion
@@ -396,5 +398,9 @@ def create_zip_file(patient_id):
 # =============================================================================
 # Flask Application Runner
 # =============================================================================
+def open_browser():
+    webbrowser.open_new("http://127.0.0.1:5000")
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    Timer(1, open_browser).start()  # Opens browser 1 second after server starts
+    app.run(debug=False, host="127.0.0.1", port=5000)
