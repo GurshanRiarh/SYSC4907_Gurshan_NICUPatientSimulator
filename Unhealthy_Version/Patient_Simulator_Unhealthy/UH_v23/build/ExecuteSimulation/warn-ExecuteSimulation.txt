@@ -1,0 +1,50 @@
+
+This file lists modules PyInstaller was not able to find. This does not
+necessarily mean this module is required for running your program. Python and
+Python 3rd-party packages include a lot of conditional or optional modules. For
+example the module 'ntpath' only exists on Windows, whereas the module
+'posixpath' only exists on Posix systems.
+
+Types if import:
+* top-level: imported at the top-level - look at these first
+* conditional: imported within an if-statement
+* delayed: imported within a function
+* optional: imported within a try-except-statement
+
+IMPORTANT: Do NOT post this list to the issue-tracker. Use it as a basis for
+            tracking down the missing module yourself. Thanks!
+
+missing module named pyimod02_importers - imported by /usr/lib/python3.13/site-packages/PyInstaller/hooks/rthooks/pyi_rth_pkgutil.py (delayed)
+missing module named _winapi - imported by encodings (delayed, conditional, optional), shutil (conditional), ntpath (optional), subprocess (conditional), mimetypes (optional), multiprocessing.connection (optional), multiprocessing.spawn (delayed, conditional), multiprocessing.reduction (conditional), multiprocessing.shared_memory (conditional), multiprocessing.heap (conditional), multiprocessing.popen_spawn_win32 (top-level), sysconfig (delayed), asyncio.windows_events (top-level), asyncio.windows_utils (top-level)
+missing module named nt - imported by shutil (conditional), importlib._bootstrap_external (conditional), ntpath (optional), _colorize (delayed, conditional, optional), os (delayed, conditional, optional), ctypes (delayed, conditional)
+missing module named 'collections.abc' - imported by tracemalloc (top-level), traceback (top-level), inspect (top-level), logging (top-level), typing (top-level), importlib.resources.readers (top-level), selectors (top-level), http.client (top-level), werkzeug.wrappers.request (top-level), werkzeug.datastructures.accept (top-level), werkzeug.datastructures.structures (top-level), typing_extensions (top-level), werkzeug.datastructures.cache_control (top-level), werkzeug.datastructures.mixins (top-level), werkzeug.datastructures.auth (top-level), werkzeug.datastructures.csp (top-level), werkzeug.datastructures.etag (top-level), werkzeug.datastructures.file_storage (top-level), werkzeug.datastructures.headers (top-level), werkzeug.datastructures.range (top-level), werkzeug.middleware.shared_data (top-level), flask.app (top-level), flask.cli (top-level), blinker.base (top-level), blinker._utilities (top-level), asyncio.base_events (top-level), asyncio.coroutines (top-level), flask.sessions (top-level)
+excluded module named _frozen_importlib - imported by importlib (optional), importlib.abc (optional), zipimport (top-level)
+missing module named _frozen_importlib_external - imported by importlib._bootstrap (delayed), importlib (optional), importlib.abc (optional), zipimport (top-level)
+missing module named winreg - imported by importlib._bootstrap_external (conditional), mimetypes (optional), urllib.request (delayed, conditional, optional), platform (delayed, optional), werkzeug.debug (delayed, conditional)
+missing module named msvcrt - imported by subprocess (optional), getpass (optional), colorama.winterm (optional), multiprocessing.spawn (delayed, conditional), multiprocessing.popen_spawn_win32 (top-level), click._winconsole (top-level), click._termui_impl (conditional), asyncio.windows_events (top-level), asyncio.windows_utils (top-level)
+missing module named _scproxy - imported by urllib.request (conditional)
+missing module named multiprocessing.BufferTooShort - imported by multiprocessing (top-level), multiprocessing.connection (top-level)
+missing module named multiprocessing.AuthenticationError - imported by multiprocessing (top-level), multiprocessing.connection (top-level)
+missing module named multiprocessing.get_context - imported by multiprocessing (top-level), multiprocessing.pool (top-level), multiprocessing.managers (top-level), multiprocessing.sharedctypes (top-level)
+missing module named multiprocessing.TimeoutError - imported by multiprocessing (top-level), multiprocessing.pool (top-level)
+missing module named multiprocessing.set_start_method - imported by multiprocessing (top-level), multiprocessing.spawn (top-level)
+missing module named multiprocessing.get_start_method - imported by multiprocessing (top-level), multiprocessing.spawn (top-level)
+missing module named multiprocessing.Value - imported by multiprocessing (top-level), werkzeug.debug (top-level)
+missing module named vms_lib - imported by platform (delayed, optional)
+missing module named 'java.lang' - imported by platform (delayed, optional)
+missing module named java - imported by platform (delayed)
+missing module named _wmi - imported by platform (optional)
+missing module named 'watchdog.observers' - imported by werkzeug._reloader (delayed)
+missing module named 'watchdog.events' - imported by werkzeug._reloader (delayed)
+missing module named watchdog - imported by werkzeug._reloader (delayed)
+missing module named bcrypt - imported by cryptography.hazmat.primitives.serialization.ssh (optional)
+missing module named '_typeshed.wsgi' - imported by werkzeug.exceptions (conditional), werkzeug.http (conditional), werkzeug.wsgi (conditional), werkzeug.utils (conditional), werkzeug.wrappers.response (conditional), werkzeug.test (conditional), werkzeug.datastructures.headers (conditional), werkzeug.formparser (conditional), werkzeug.wrappers.request (conditional), werkzeug.serving (conditional), werkzeug.debug (conditional), werkzeug.middleware.shared_data (conditional), werkzeug.local (conditional), werkzeug.routing.exceptions (conditional), werkzeug.routing.map (conditional), flask.typing (conditional), flask.ctx (conditional), flask.testing (conditional), flask.cli (conditional), flask.app (conditional)
+missing module named _typeshed - imported by werkzeug._internal (conditional)
+missing module named _overlapped - imported by asyncio.windows_events (top-level)
+missing module named asyncio.DefaultEventLoopPolicy - imported by asyncio (delayed, conditional), asyncio.events (delayed, conditional)
+missing module named asgiref - imported by flask.app (delayed, optional)
+missing module named dotenv - imported by flask.cli (delayed, optional)
+missing module named Vital_Sign_Interactive_Plots_Unhealthy - imported by /home/Gurshan.R/Documents/GitHub/SYSC4907_GurshanRiarh_101182603_NICU_Patient_Simulator/Unhealthy_Version/Patient_Simulator_Unhealthy/UH_v23/Unhealthy_Files/GUI_Files/ExecuteSimulation.py (top-level)
+missing module named Vital_Sign_Static_Plots_Unhealthy - imported by /home/Gurshan.R/Documents/GitHub/SYSC4907_GurshanRiarh_101182603_NICU_Patient_Simulator/Unhealthy_Version/Patient_Simulator_Unhealthy/UH_v23/Unhealthy_Files/GUI_Files/ExecuteSimulation.py (top-level)
+missing module named NICU_Simulator_Params_Unhealthy - imported by /home/Gurshan.R/Documents/GitHub/SYSC4907_GurshanRiarh_101182603_NICU_Patient_Simulator/Unhealthy_Version/Patient_Simulator_Unhealthy/UH_v23/Unhealthy_Files/GUI_Files/ExecuteSimulation.py (top-level)
+missing module named NICU_Simulator_Parmas - imported by /home/Gurshan.R/Documents/GitHub/SYSC4907_GurshanRiarh_101182603_NICU_Patient_Simulator/Unhealthy_Version/Patient_Simulator_Unhealthy/UH_v23/Unhealthy_Files/GUI_Files/ExecuteSimulation.py (top-level)
