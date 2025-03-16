@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Markmap</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.18.10/dist/style.css">
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.10/dist/browser/index.js"></script><script src="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.18.10/dist/index.js"></script><script>(r => {
+              setTimeout(r);
+            })(function renderToolbar() {
+  const {
+    markmap,
+    mm
+  } = window;
+  const {
+    el
+  } = markmap.Toolbar.create(mm);
+  el.setAttribute('style', 'position:absolute;bottom:20px;right:20px');
+  document.body.append(el);
+})</script><script>((getMarkmap, getOptions, root2, jsonOptions) => {
+              const markmap = getMarkmap();
+              window.mm = markmap.Markmap.create(
+                "svg#mindmap",
+                (getOptions || markmap.deriveOptions)(jsonOptions),
+                root2
+              );
+            })(() => window.markmap,null,{"content":"NICU Patient Simulator Flow","children":[{"content":"\n<p data-lines=\"2,3\"><strong>User Interface (Web)</strong></p>","children":[{"content":"<strong>Mode Selection</strong>","children":[{"content":"Preterm (Healthy) Simulation","children":[],"payload":{"tag":"li","lines":"4,5"}},{"content":"Neonate (Unhealthy) Simulation","children":[],"payload":{"tag":"li","lines":"5,6"}}],"payload":{"tag":"li","lines":"3,6"}},{"content":"<strong>Patient Information Input</strong>","children":[{"content":"Patient ID, Start Time, Age, Weight, Gender","children":[],"payload":{"tag":"li","lines":"7,8"}},{"content":"Select Condition (Normal, Bradycardia, Tachycardia, Both)","children":[],"payload":{"tag":"li","lines":"8,9"}},{"content":"Choose Interventions","children":[],"payload":{"tag":"li","lines":"9,11"}}],"payload":{"tag":"li","lines":"6,11"}}],"payload":{"tag":"li","lines":"2,11"}},{"content":"\n<p data-lines=\"11,12\"><strong>Simulation Engine</strong></p>","children":[{"content":"<strong>Simulator Instantiation</strong>","children":[{"content":"Healthy Simulator (Preterm) OR Unhealthy Simulator (Neonate)","children":[],"payload":{"tag":"li","lines":"13,14"}}],"payload":{"tag":"li","lines":"12,14"}},{"content":"<strong>Synthetic Data Generation</strong>","children":[{"content":"Load Pre-trained GAN Models","children":[{"content":"Heart Rate &amp; Respiration Rate Generators","children":[],"payload":{"tag":"li","lines":"16,17"}},{"content":"(For Neonates) Additional Bradycardia/Tachycardia Generators","children":[],"payload":{"tag":"li","lines":"17,18"}}],"payload":{"tag":"li","lines":"15,18"}},{"content":"Generate Vital Signs","children":[{"content":"Apply Noise &amp; Normalization","children":[],"payload":{"tag":"li","lines":"19,20"}},{"content":"Smoothing &amp; Delta Calculation","children":[],"payload":{"tag":"li","lines":"20,21"}}],"payload":{"tag":"li","lines":"18,21"}}],"payload":{"tag":"li","lines":"14,21"}},{"content":"<strong>Intervention Scheduling &amp; Pain Assessment</strong>","children":[{"content":"Scheduled Interventions (Feeding, Medication, etc.)","children":[],"payload":{"tag":"li","lines":"22,23"}},{"content":"Random Interventions based on Poisson rates","children":[],"payload":{"tag":"li","lines":"23,24"}},{"content":"Determine Pain Level from Vital Signs","children":[],"payload":{"tag":"li","lines":"24,26"}}],"payload":{"tag":"li","lines":"21,26"}}],"payload":{"tag":"li","lines":"11,26"}},{"content":"\n<p data-lines=\"26,27\"><strong>Data Export &amp; Visualization</strong></p>","children":[{"content":"<strong>Data Export</strong>","children":[{"content":"JSON File with Patient &amp; Simulation Data","children":[],"payload":{"tag":"li","lines":"28,29"}},{"content":"CSV Files for GAN Outputs &amp; Interventions","children":[],"payload":{"tag":"li","lines":"29,30"}}],"payload":{"tag":"li","lines":"27,30"}},{"content":"<strong>Visualization</strong>","children":[{"content":"Static Plots (Matplotlib PNGs)","children":[],"payload":{"tag":"li","lines":"31,32"}},{"content":"Interactive Plots (Plotly HTML)","children":[],"payload":{"tag":"li","lines":"32,34"}}],"payload":{"tag":"li","lines":"30,34"}}],"payload":{"tag":"li","lines":"26,34"}},{"content":"\n<p data-lines=\"34,35\"><strong>Web Application (Flask)</strong></p>","children":[{"content":"Displays Simulation Results","children":[],"payload":{"tag":"li","lines":"35,36"}},{"content":"Provides Download Options for Data &amp; Plots","children":[],"payload":{"tag":"li","lines":"36,37"}}],"payload":{"tag":"li","lines":"34,37"}}],"payload":{"tag":"h1","lines":"0,1"}},{})</script>
+</body>
+</html>

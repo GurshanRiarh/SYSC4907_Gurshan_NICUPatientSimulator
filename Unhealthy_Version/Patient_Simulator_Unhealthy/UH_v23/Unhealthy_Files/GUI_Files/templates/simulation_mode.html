@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 
+    =============================================================================
+    Metadata and External Stylesheets
+    =============================================================================
+    - Set character encoding and viewport.
+    - Link to Bootstrap CSS for responsive layout.
+    - Link to custom CSS and Font Awesome icons.
+  -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Select Simulation Mode</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- 
+    =============================================================================
+    Embedded CSS for Specific Page Styling
+    =============================================================================
+    - Center the content container vertically and horizontally.
+    - Define styling for the selection card and mode buttons.
+  -->
+  <style>
+    /* Center the content vertically and horizontally */
+    .mode-container {
+      min-height: 80vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    /* Card container for the selection options */
+    .selection-card {
+      max-width: 500px;
+      width: 100%;
+      padding: 20px;
+    }
+    /* Style for the mode buttons */
+    .mode-btn {
+      margin: 1rem 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    =============================================================================
+    Navigation Bar
+    =============================================================================
+    - Provides a header with a link to return to simulation mode selection.
+    - Includes a help button that opens a modal with instructions.
+  -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <!-- Navbar brand with tooltip for returning to simulation mode -->
+      <a class="navbar-brand" href="/" data-bs-toggle="tooltip" title="Return to simulation mode selection">
+        <i class="fas fa-baby me-2"></i>Neonatal Intensive Care Unit Patient Simulator
+      </a>
+      <!-- Help button which opens the help modal -->
+      <button class="btn btn-light ms-auto" id="helpBtn" data-bs-toggle="modal" data-bs-target="#helpModal" title="Click here for help">
+        <i class="fas fa-question-circle"></i> Help
+      </button>
+    </div>
+  </nav>
+  
+  <!-- 
+    =============================================================================
+    Main Content: Simulation Mode Selection
+    =============================================================================
+    - Displays a centered card where the user selects the simulation mode.
+    - Contains two large buttons: one for preterm simulation and one for neonate simulation.
+  -->
+  <div class="container mode-container">
+    <div class="card selection-card shadow">
+      <div class="card-body text-center">
+        <h1 class="card-title">Select Simulation Mode</h1>
+        <div class="mt-4">
+          <!-- Preterm Simulation Button -->
+          <button type="button"
+                  class="btn btn-primary btn-lg mode-btn" 
+                  data-bs-toggle="popover" 
+                  data-bs-trigger="hover" 
+                  data-bs-placement="bottom" 
+                  data-bs-content="Simulate preterm infants simulation that allows for regular heart rate conditions."
+                  onclick="window.location.href='/setup?mode=preterm'">
+            Preterm Simulation
+          </button>
+          <!-- Neonate Simulation Button -->
+          <button type="button" 
+                  class="btn btn-primary btn-lg mode-btn" 
+                  data-bs-toggle="popover" 
+                  data-bs-trigger="hover" 
+                  data-bs-placement="bottom" 
+                  data-bs-content="Simulate neonates with potential cardiac issues."
+                  onclick="window.location.href='/setup?mode=neonate'">
+            Neonate Simulation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 
+    =============================================================================
+    Footer Section
+    =============================================================================
+    - Provides project attribution and contact information.
+  -->
+  <footer class="footer text-center">
+    <div class="container text-center text-muted">
+      <p>NICU Patient Simulator | SYSC4907 Capstone Project | Gurshan Riarh &amp; Jesse Levine</p>
+    </div>
+  </footer>
+  
+  <!-- 
+    =============================================================================
+    Help Modal
+    =============================================================================
+    - A modal window that displays instructions on how to use the simulator.
+  -->
+  <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-dark" id="helpModalLabel">How to Use the Simulator:</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-dark">
+          <p><strong>Step 1:</strong> Select a simulation mode from the options below.</p>
+          <p><strong>Preterm Simulation:</strong> Simulate preterm infants normal vital signs and daily interventions.</p>
+          <p><strong>Neonate Simulation:</strong> Simulate neonates with potential cardiac issues and daily interventions.</p>
+          <hr />
+          <p><strong>Contact:</strong> If there are any technical issues or questions, please direct them to Gurshanriarh@cmail.carleton.ca</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 
+    =============================================================================
+    External JavaScript: Bootstrap and Custom Scripts
+    =============================================================================
+    - Loads Bootstrap JS bundle and initializes popovers and tooltips.
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Initialize all popovers on the page for additional context
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl);
+    });
+    
+    // Initialize tooltips on elements that have data-bs-toggle="tooltip"
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+      new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  </script>
+</body>
+</html>

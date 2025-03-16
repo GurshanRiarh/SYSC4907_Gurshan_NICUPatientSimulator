@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 
+    =============================================================================
+    Metadata and External Resource Links
+    =============================================================================
+    This section sets up the document metadata and links to external CSS files 
+    (Bootstrap, Font Awesome) as well as custom CSS.
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulation Results - NICU Patient Simulator</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- 
+    =============================================================================
+    Navigation Bar
+    =============================================================================
+    Provides a navigation header with a link to return to the simulation mode 
+    selection and a help button that opens a help modal.
+  -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <!-- Navbar brand with tooltip -->
+      <a class="navbar-brand" href="/" data-bs-toggle="tooltip" title="Return to simulation mode selection">
+        <i class="fas fa-baby me-2"></i>Neonatal Intensive Care Unit Patient Simulator
+      </a>
+      <!-- Help button for the results page -->
+      <button class="btn btn-light ms-auto" id="helpBtn" data-bs-toggle="modal" data-bs-target="#helpModal" title="Click here for help on the results page">
+        <i class="fas fa-question-circle"></i> Help
+      </button>
+    </div>
+  </nav>
+  
+  <!-- 
+    =============================================================================
+    Main Results Content
+    =============================================================================
+    This container holds the simulation results, including patient details, 
+    navigation tabs for different data views (Data Files, JSON, Visualization, CSVs).
+  -->
+  <div class="container mt-4">
+    <div class="card shadow">
+      <!-- Card header displaying a success message and patient ID -->
+      <div class="card-header bg-success text-white">
+        <h3 class="card-title text-center mb-0">
+          <i class="fas fa-check-circle me-2"></i>Simulation Completed
+        </h3>
+      </div>
+      <div class="card-body">
+        <!-- Patient information summary -->
+        <div class="text-center mb-4">
+          <h4>Patient ID: <span class="fw-bold">{{ patient_id }}</span></h4>
+          <div class="badge bg-primary fs-6 my-2">
+            {% if is_bradycardic and is_tachycardic %}
+              <i class="fas fa-exclamation-triangle me-1"></i>Bradycardia & Tachycardia
+            {% elif is_bradycardic %}
+              <i class="fas fa-heartbeat me-1"></i>Bradycardia
+            {% elif is_tachycardic %}
+              <i class="fas fa-heartbeat me-1"></i>Tachycardia
+            {% else %}
+              <i class="fas fa-heart me-1"></i>None
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Navigation tabs for switching between data views -->
+        <ul class="nav nav-tabs" id="resultTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <!-- Data Files Tab -->
+            <button class="nav-link active" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button" role="tab" aria-controls="data" aria-selected="true" style="color: black;" data-bs-toggle="tooltip" title="View JSON data and interactive plots ZIP file">
+              <i class="fas fa-table me-1"></i>Data Files
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <!-- Patient Data JSON Tab -->
+            <button class="nav-link" id="json-tab" data-bs-toggle="tab" data-bs-target="#json" type="button" role="tab" aria-controls="json" aria-selected="false" style="color: black;" data-bs-toggle="tooltip" title="Display raw JSON simulation output">
+              <i class="fas fa-code me-1"></i>Patient Data JSON
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <!-- Data Visualization Tab -->
+            <button class="nav-link" id="visualization-tab" data-bs-toggle="tab" data-bs-target="#visualization" type="button" role="tab" aria-controls="visualization" aria-selected="false" style="color: black;" data-bs-toggle="tooltip" title="View interactive plots of simulation data">
+              <i class="fas fa-chart-line me-1"></i>Data Visualization
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <!-- Generated CSVs Tab -->
+            <button class="nav-link" id="csv-tab" data-bs-toggle="tab" data-bs-target="#csv" type="button" role="tab" aria-controls="csv" aria-selected="false" style="color: black;" data-bs-toggle="tooltip" title="View and download generated CSV files">
+              <i class="fas fa-file-csv me-1"></i>Generated CSVs
+            </button>
+          </li>
+        </ul>
+        
+        <!-- Tab content container -->
+        <div class="tab-content p-3 border border-top-0 rounded-bottom" id="resultTabsContent">
+          <!-- Data Files Tab Content -->
+          <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="data-tab">
+            <div class="row">
+              <!-- JSON Files Card -->
+              <div class="col-md-6">
+                <div class="card mb-3">
+                  <div class="card-header bg-light">
+                    <i class="fas fa-file-code me-1"></i>JSON Files
+                  </div>
+                  <div class="card-body">
+                    <div class="d-grid gap-2">
+                      <a href="/download/{{ patient_id }}/{{ patient_id }}_Data.json" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                        <i class="fas fa-download me-1"></i>Patient Data
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Interactive Plots ZIP Card (conditionally displayed) -->
+              {% if is_bradycardic is not defined or is_tachycardic is not defined or (not is_bradycardic and not is_tachycardic) %}
+              <div class="col-md-6">
+                <div class="card mb-3">
+                  <div class="card-header bg-light">
+                    <i class="fas fa-file-archive me-1"></i>Interactive Plots (ZIP)
+                  </div>
+                  <div class="card-body">
+                    <div class="d-grid gap-2">
+                      <a href="/download/{{ patient_id }}/interactive_plots.zip" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                        <i class="fas fa-download me-1"></i>Download Interactive Plots (ZIP)
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              <!-- CSV Files Card -->
+              <div class="col-md-6">
+                <div class="card mb-3">
+                  <div class="card-header bg-light">
+                    <i class="fas fa-file-csv me-1"></i>CSV Files
+                  </div>
+                  <div class="card-body">
+                    <div class="d-grid gap-2">
+                      <a href="/download/{{ patient_id }}/{{ patient_id }}_Interventions.csv" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                        <i class="fas fa-download me-1"></i>Interventions
+                      </a>
+                      {% if is_bradycardic and is_tachycardic %}
+                        <a href="/download/{{ patient_id }}/{{ patient_id }}_GAN_Heart_Rate_BradyTachycardia.csv" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                          <i class="fas fa-download me-1"></i>GAN HR (BradyTachy)
+                        </a>
+                      {% elif is_bradycardic %}
+                        <a href="/download/{{ patient_id }}/{{ patient_id }}_GAN_Heart_Rate_Bradycardia.csv" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                          <i class="fas fa-download me-1"></i>GAN HR (Bradycardia)
+                        </a>
+                      {% elif is_tachycardic %}
+                        <a href="/download/{{ patient_id }}/{{ patient_id }}_GAN_Heart_Rate_Tachycardia.csv" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                          <i class="fas fa-download me-1"></i>GAN HR (Tachycardia)
+                        </a>
+                      {% else %}
+                        <a href="/download/{{ patient_id }}/{{ patient_id }}_GAN_Heart_Rate_Normal.csv" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                          <i class="fas fa-download me-1"></i>GAN HR (Normal)
+                        </a>
+                      {% endif %}
+                      <a href="/download/{{ patient_id }}/{{ patient_id }}_GAN_HR_Delta.csv" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                        <i class="fas fa-download me-1"></i>GAN HR Delta
+                      </a>
+                      <a href="/download/{{ patient_id }}/{{ patient_id }}_GAN_Respiration_Rate.csv" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                        <i class="fas fa-download me-1"></i>GAN Respiration Rate
+                      </a>
+                      <a href="/download/{{ patient_id }}/{{ patient_id }}_GAN_RespRate_Delta.csv" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                        <i class="fas fa-download me-1"></i>GAN Respiration Delta
+                      </a>
+                      <a href="/download/{{ patient_id }}/{{ patient_id }}_Temp_Delta.csv" class="btn btn-outline-primary" style="color: greenyellow !important;">
+                        <i class="fas fa-download me-1"></i>Temperature Delta
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 
+            =============================================================================
+            Data Visualization Tab Content
+            =============================================================================
+            This tab displays interactive plots of vital signs using iframes.
+          -->
+          <div class="tab-pane fade" id="visualization" role="tabpanel" aria-labelledby="visualization-tab">
+            <div class="card shadow">
+              <div class="card-header bg-light">
+                <h4 class="card-title text-center mb-0">Interactive Plots</h4>
+              </div>
+              <div class="card-body">
+                <!-- Heart Rate Plot -->
+                <div class="mb-3">
+                  <h5>Heart Rate</h5>
+                  <iframe src="/display_plot/{{ patient_id }}/Heart_Rate" frameborder="0" style="width:100%; height:400px;"></iframe>
+                </div>
+                <!-- Respiratory Rate Plot -->
+                <div class="mb-3">
+                  <h5>Respiratory Rate</h5>
+                  <iframe src="/display_plot/{{ patient_id }}/Respiratory_Rate" frameborder="0" style="width:100%; height:400px;"></iframe>
+                </div>
+                <!-- Body Temperature Plot -->
+                <div class="mb-3">
+                  <h5>Body Temperature</h5>
+                  <iframe src="/display_plot/{{ patient_id }}/Body_Temperature" frameborder="0" style="width:100%; height:400px;"></iframe>
+                </div>
+                <!-- HR Delta Plot -->
+                <div class="mb-3">
+                  <h5>HR Delta</h5>
+                  <iframe src="/display_plot/{{ patient_id }}/HR_Delta" frameborder="0" style="width:100%; height:400px;"></iframe>
+                </div>
+                <!-- Respiratory Rate Delta Plot -->
+                <div class="mb-3">
+                  <h5>Resp Rate Delta</h5>
+                  <iframe src="/display_plot/{{ patient_id }}/RespRate_Delta" frameborder="0" style="width:100%; height:400px;"></iframe>
+                </div>
+                <!-- Temperature Delta Plot -->
+                <div class="mb-3">
+                  <h5>Body Temp Delta</h5>
+                  <iframe src="/display_plot/{{ patient_id }}/Temp_Delta" frameborder="0" style="width:100%; height:400px;"></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 
+            =============================================================================
+            Generated CSVs Tab Content
+            =============================================================================
+            This tab allows users to select and view CSV files generated by the simulation.
+          -->
+          <div class="tab-pane fade" id="csv" role="tabpanel" aria-labelledby="csv-tab">
+            <div class="card shadow">
+              <div class="card-header bg-light">
+                <h4 class="card-title text-center mb-0">Generated CSVs</h4>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label for="csvSelect" class="form-label">Select CSV to view:</label>
+                  <select class="form-select" id="csvSelect">
+                    {% if is_bradycardic and is_tachycardic %}
+                      <option value="{{ patient_id }}_GAN_Heart_Rate_BradyTachycardia.csv">GAN Heart Rate (BradyTachycardia)</option>
+                    {% elif is_bradycardic %}
+                      <option value="{{ patient_id }}_GAN_Heart_Rate_Bradycardia.csv">GAN Heart Rate (Bradycardia)</option>
+                    {% elif is_tachycardic %}
+                      <option value="{{ patient_id }}_GAN_Heart_Rate_Tachycardia.csv">GAN Heart Rate (Tachycardia)</option>
+                    {% else %}
+                      <option value="{{ patient_id }}_GAN_Heart_Rate_Normal.csv">GAN Heart Rate (Normal)</option>
+                    {% endif %}
+                    <option value="{{ patient_id }}_GAN_Respiration_Rate.csv">GAN Respiration Rate</option>
+                    <option value="{{ patient_id }}_GAN_HR_Delta.csv">GAN HR Delta</option>
+                    <option value="{{ patient_id }}_GAN_RespRate_Delta.csv">GAN Respiration Delta</option>
+                    <option value="{{ patient_id }}_Temp_Delta.csv">Temperature Delta</option>
+                    <option value="{{ patient_id }}_Interventions.csv">Interventions</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <button id="viewCsvBtn" class="btn btn-primary">View CSV</button>
+                </div>
+                <div id="csvDisplay" class="border p-3" style="height:400px; overflow:auto;"></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 
+            =============================================================================
+            Patient Data JSON Tab Content
+            =============================================================================
+            Displays the raw JSON simulation output.
+          -->
+          <div class="tab-pane fade" id="json" role="tabpanel" aria-labelledby="json-tab">
+            <div class="card shadow">
+              <div class="card-header bg-light">
+                <h4 class="card-title text-center mb-0">Patient Data JSON</h4>
+              </div>
+              <div class="card-body">
+                <div id="jsonDisplay" class="border p-3" style="height:400px; overflow:auto;"></div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- 
+          =============================================================================
+          Navigation Buttons (Back & Download All Data)
+          =============================================================================
+        -->
+        <div class="text-center mt-4">
+          <a href="/" class="btn btn-primary" data-bs-toggle="tooltip" title="Return to simulation input page">
+            <i class="fas fa-home me-1"></i>Back to Input Page
+          </a>
+          <a href="/download/{{ patient_id }}/all_data.zip" class="btn btn-success ms-2" data-bs-toggle="tooltip" title="Download all simulation data as a ZIP file">
+            <i class="fas fa-file-archive me-1"></i>Download All Data
+          </a>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  <!-- 
+    =============================================================================
+    Footer Section
+    =============================================================================
+  -->
+  <footer class="footer text-center">
+    <div class="container text-center text-muted">
+      <p>NICU Patient Simulator | SYSC4907 Capstone Project | Gurshan Riarh &amp; Jesse Levine</p>
+    </div>
+  </footer>
+  
+  <!-- 
+    =============================================================================
+    Help Modal
+    =============================================================================
+    A modal dialog that provides instructions and troubleshooting tips for the results page.
+  -->
+  <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-dark" id="helpModalLabel">Results Help</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-dark">
+          <p>This page displays the simulation results for the NICU Patient Simulator.</p>
+          <ul>
+            <li><strong>Data Files:</strong> Contains JSON files, a ZIP archive of interactive plots, and CSV download options.</li>
+            <li><strong>Patient Data JSON:</strong> Displays the raw JSON output from the simulation.</li>
+            <li><strong>Data Visualization:</strong> Provides interactive plots for the simulated vital signs.</li>
+            <li><strong>Generated CSVs:</strong> Allows you to view and download CSV files containing simulation data.</li>
+          </ul>
+          <p>If you have any questions about interpreting the data or experience issues, please contact support at <a href="mailto:Gurshanriarh@cmail.carleton.ca">Gurshanriarh@cmail.carleton.ca</a>.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 
+    =============================================================================
+    External JavaScript Files and Inline Scripts
+    =============================================================================
+    Loads the Bootstrap JS bundle and custom JavaScript for handling CSV display,
+    JSON loading, and initialization of tooltips/popovers.
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/result.js') }}"></script>
+  <script>
+    // CSV display functionality: load selected CSV and display its contents
+    document.getElementById('viewCsvBtn').addEventListener('click', function() {
+      var csvFile = document.getElementById('csvSelect').value;
+      var url = "/display_csv/{{ patient_id }}/" + csvFile;
+      fetch(url)
+        .then(function(response) {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.text();
+        })
+        .then(function(data) {
+          document.getElementById('csvDisplay').innerHTML = data;
+        })
+        .catch(function(error) {
+          document.getElementById('csvDisplay').innerHTML = "Error loading CSV: " + error;
+        });
+    });
+    
+    // Automatically load JSON data when the JSON tab is shown
+    var jsonTab = document.getElementById('json-tab');
+    if(jsonTab) {
+      jsonTab.addEventListener('shown.bs.tab', function(event) {
+        var url = "/display_json/{{ patient_id }}";
+        fetch(url)
+          .then(function(response) {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.text();
+          })
+          .then(function(data) {
+            document.getElementById('jsonDisplay').innerHTML = data;
+          })
+          .catch(function(error) {
+            document.getElementById('jsonDisplay').innerHTML = "Error loading JSON: " + error;
+          });
+      });
+    }
+    
+    // Initialize tooltips for each tab using their IDs
+    document.addEventListener("DOMContentLoaded", function() {
+      new bootstrap.Tooltip(document.getElementById("data-tab"), {title: "View JSON data and interactive plots ZIP file", placement: "bottom"});
+      new bootstrap.Tooltip(document.getElementById("json-tab"), {title: "Display raw JSON simulation output", placement: "bottom"});
+      new bootstrap.Tooltip(document.getElementById("visualization-tab"), {title: "View interactive plots of simulation data", placement: "bottom"});
+      new bootstrap.Tooltip(document.getElementById("csv-tab"), {title: "View and download generated CSV files", placement: "bottom"});
+    });
+  </script>
+</body>
+</html>

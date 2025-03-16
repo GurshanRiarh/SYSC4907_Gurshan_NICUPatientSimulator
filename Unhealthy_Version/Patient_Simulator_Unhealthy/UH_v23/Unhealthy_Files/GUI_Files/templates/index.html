@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 
+    =============================================================================
+    Metadata and External Resource Links
+    =============================================================================
+    This section defines the document's character set, viewport settings, and includes
+    external CSS libraries (Bootstrap, Font Awesome) as well as custom CSS.
+  -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NICU Patient Simulator Form</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <!-- Font Awesome for icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  
+  <!-- 
+    =============================================================================
+    Embedded JavaScript for Form Functionality
+    =============================================================================
+    This script includes helper functions to read the simulation mode from the URL,
+    populate the Age dropdown based on simulation mode, and update the Condition dropdown.
+  -->
+  <script>
+    // Helper function to read simulation mode from URL
+    function getSimulationMode() {
+      var params = new URLSearchParams(window.location.search);
+      return params.get("mode") || "preterm"; // default to preterm if not specified
+    }
+
+    // Populate the Age dropdown based on simulation mode
+    function updateAgeDropdown() {
+      var simulationMode = getSimulationMode();
+      var ageDropdown = document.getElementById("Age");
+      // Clear existing options
+      ageDropdown.innerHTML = "";
+      if (simulationMode === "preterm") {
+        // Populate gestational age dropdown (22/1 to 40/6)
+        for (var week = 22; week <= 40; week++) {
+          for (var day = 1; day <= 6; day++) {
+            var option = document.createElement("option");
+            option.value = week + "/" + day;
+            option.text = week + " weeks / " + day + " days";
+            ageDropdown.appendChild(option);
+          }
+        }
+      } else {
+        // Populate age in days dropdown (1 to 28)
+        for (var day = 1; day <= 28; day++) {
+          var option = document.createElement("option");
+          option.value = day;
+          option.text = day + (day === 1 ? " day" : " days");
+          ageDropdown.appendChild(option);
+        }
+      }
+    }
+
+    // Update the Condition dropdown based on simulation mode
+    function updateConditionDropdown() {
+      var simulationMode = getSimulationMode();
+      var conditionDropdown = document.getElementById("condition");
+      // Clear existing options
+      conditionDropdown.innerHTML = "";
+      if (simulationMode === "preterm") {
+        // For preterm simulation, force healthy condition only
+        var option = document.createElement("option");
+        option.value = "none";
+        option.text = "None (Healthy)";
+        conditionDropdown.appendChild(option);
+        conditionDropdown.disabled = true;
+      } else {
+        // For neonate simulation, show only unhealthy options
+        conditionDropdown.disabled = false;
+        var options = [
+          {value: "normal", text: "Normal"},
+          { value: "bradycardia", text: "Bradycardia" },
+          { value: "tachycardia", text: "Tachycardia" },
+          { value: "both", text: "Bradycardia & Tachycardia" }
+        ];
+        options.forEach(function(opt) {
+          var option = document.createElement("option");
+          option.value = opt.value;
+          option.text = opt.text;
+          conditionDropdown.appendChild(option);
+        });
+      }
+    }
+  </script>
+
+  <!-- 
+    =============================================================================
+    Embedded CSS for Dropdown Styling
+    =============================================================================
+    Custom styles to ensure dropdowns and buttons match the desired appearance.
+  -->
+  <style>
+    /* Force the dropdown to match the width/format of other selects */
+    .dropdown.mb-3 {
+      width: 100%;
+    }
+    /* The button: same look as a form-select, but with a dropdown arrow */
+    #interventionDropdown.form-select.dropdown-toggle {
+      text-align: left;
+      width: 100%;
+    }
+    /* Make the dropdown menu fully match the button width */
+    .dropdown-menu {
+      width: 100% !important; /* Ensures the menu matches the button width */
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+    }
+    /* Constrain the height and enable scrolling */
+    .dropdown-menu.p-3 {
+      max-height: 300px; /* Adjust as needed */
+      overflow-y: auto;
+    }
+    /* Center each checkbox + label pair */
+    .dropdown-menu .form-check {
+      display: flex;
+      justify-content: center; 
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    /* Optional: give the checkbox a little spacing from the label */
+    .dropdown-menu .form-check-input {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+    =============================================================================
+    Navigation Bar
+    =============================================================================
+    The navigation bar provides a link to return to the simulation mode selection 
+    page and includes a help button with tooltip.
+  -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <!-- Navbar brand with tooltip -->
+      <a class="navbar-brand" href="/" data-bs-toggle="tooltip" title="Return to simulation mode selection">
+        <i class="fas fa-baby me-2"></i>Neonatal Intensive Care Unit Patient Simulator
+      </a>
+      <!-- Help button with tooltip -->
+      <button class="btn btn-light ms-auto" id="helpBtn" data-bs-toggle="tooltip" title="Click here for help">
+        <i class="fas fa-question-circle"></i> Help
+      </button>
+    </div>
+  </nav>
+
+  <!-- 
+    =============================================================================
+    Main Form Container
+    =============================================================================
+    This container centers the patient simulation setup form vertically and horizontally.
+  -->
+  <div class="container center-container" style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+    <div class="card shadow">
+      <div class="card-header bg-white">
+        <h3 class="card-title text-center mb-0">Patient Simulation Setup</h3>
+      </div>
+      <div class="card-body">
+        <form action="/simulate" method="POST" id="simulationForm">
+          <!-- Hidden input to pass simulation mode to the backend -->
+          <input type="hidden" name="simulation_mode" id="simulation_mode" value="">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <!-- Patient ID input with tooltip -->
+              <label for="patient_id" class="form-label" data-bs-toggle="tooltip" title="Enter a unique patient identifier">Patient ID</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                <input
+                  type="text"
+                  id="patient_id"
+                  name="patient_id"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <!-- Start Time dropdown with tooltip -->
+              <label for="start_time" class="form-label" data-bs-toggle="tooltip" title="Select the simulation start time (HH:MM:SS)">Start Time (HH:MM:SS)</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                <select id="start_time" name="start_time" class="form-select" required>
+                  {% for hour in range(0, 24) %}
+                    {% for minute in range(0, 60) %}
+                      <option value="{{ '%02d' % hour }}:{{ '%02d' % minute }}:00">
+                        {{ '%02d' % hour }}:{{ '%02d' % minute }}:00
+                      </option>
+                    {% endfor %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 
+            =============================================================================
+            Patient Condition and Age Section
+            =============================================================================
+            This section includes the patient condition dropdown and dynamically populated Age field.
+          -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <!-- Condition dropdown with tooltip -->
+              <label for="condition" class="form-label" data-bs-toggle="tooltip" title="Choose the patient condition. Options adjust based on simulation mode">Patient Condition</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-heartbeat"></i></span>
+                <select
+                  id="condition"
+                  name="condition"
+                  class="form-select"
+                  required
+                  onchange="updateAgeDropdown()"
+                >
+                  <option value="none">None</option>
+                  <option value="bradycardia">Bradycardia</option>
+                  <option value="tachycardia">Tachycardia</option>
+                  <option value="both">Bradycardia & Tachycardia</option>
+                </select>
+              </div>
+              <!-- Hidden input to ensure condition is submitted when the select is disabled -->
+              <input type="hidden" name="condition" id="condition_hidden" value="">
+            </div>
+            <div class="col-md-6 mb-3">
+              <!-- Age dropdown with tooltip (will be populated dynamically) -->
+              <label for="Age" class="form-label" data-bs-toggle="tooltip" title="For preterm simulation: post-conceptual age (weeks/days); for neonate simulation: age in days">Age</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                <select id="Age" name="Age" class="form-select" required>
+                  <!-- Options populated via JavaScript -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 
+            =============================================================================
+            Intervention Selection Dropdown
+            =============================================================================
+            A custom dropdown for selecting which interventions to simulate. It mimics the 
+            style of a form-select and provides a scrollable list of checkboxes.
+          -->
+          <div class="dropdown mb-3">
+            <label for="interventionDropdown" class="form-label" data-bs-toggle="tooltip" title="Select the interventions you want to simulate. All options are selected by default.">
+              Interventions
+            </label>
+            <button
+              class="form-select dropdown-toggle"
+              type="button"
+              id="interventionDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              title="Select interventions to simulate. All options are selected by default."
+            >
+              Select Interventions to Simulate
+            </button>
+            <div
+              class="dropdown-menu p-3"
+              aria-labelledby="interventionDropdown"
+            >
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="feeding" value="feeding" checked />
+                <label class="form-check-label" for="feeding">Feeding</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="medication" value="medication" checked />
+                <label class="form-check-label" for="medication">Medication</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="diaper_change" value="diaper change" checked />
+                <label class="form-check-label" for="diaper_change">Diaper Change</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="position_change" value="position change" checked />
+                <label class="form-check-label" for="position_change">Position Change</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="oxygen_administration" value="oxygen administration" checked />
+                <label class="form-check-label" for="oxygen_administration">Oxygen Administration</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="lighting_adjustment" value="lighting adjustment" checked />
+                <label class="form-check-label" for="lighting_adjustment">Lighting Adjustment</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="lab_test" value="lab test" checked />
+                <label class="form-check-label" for="lab_test">Lab Test</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="imaging" value="imaging" checked />
+                <label class="form-check-label" for="imaging">Imaging</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="family_visitation" value="family visitation" checked />
+                <label class="form-check-label" for="family_visitation">Family Visitation</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="interventions" id="pain_management" value="pain management" checked />
+                <label class="form-check-label" for="pain_management">Pain Management</label>
+              </div>
+            </div>
+          </div>
+          <!-- End of Intervention Dropdown -->
+
+          <!-- 
+            =============================================================================
+            Additional Patient Details: Weight and Gender
+            =============================================================================
+          -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <!-- Weight selection with tooltip -->
+              <label for="weight" class="form-label" data-bs-toggle="tooltip" title="Select the patient weight in kg">Weight (kg)</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-weight"></i></span>
+                <select id="weight" name="weight" class="form-select" required>
+                  {% for weight in range(20, 61) %}
+                    <option value="{{ weight / 10 }}">{{ weight / 10 }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <!-- Gender selection with tooltip -->
+              <label for="gender" class="form-label" data-bs-toggle="tooltip" title="Select the patient gender">Gender</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                <select id="gender" name="gender" class="form-select" required>
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 
+            =============================================================================
+            Form Submission and Navigation
+            =============================================================================
+          -->
+          <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+              <i class="fas fa-play-circle me-2"></i>Run Simulation
+            </button>
+          </div>
+          <div class="d-grid gap-2 mt-2">
+            <a href="/" class="btn btn-secondary btn-lg" data-bs-toggle="tooltip" title="Return to simulation mode selection">
+              <i class="fas fa-arrow-left me-2"></i>Change Simulation Mode
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 
+    =============================================================================
+    Footer Section
+    =============================================================================
+  -->
+  <footer class="footer text-center">
+    <div class="container text-center text-muted">
+      <p>NICU Patient Simulator | SYSC4907 Capstone Project | Gurshan Riarh &amp; Jesse Levine</p>
+    </div>
+  </footer>
+
+  <!-- 
+    =============================================================================
+    Help Modal
+    =============================================================================
+    A modal dialog to provide instructions on how to use the simulator.
+  -->
+  <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-dark" id="helpModalLabel">How to Use the Simulator:</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-dark">
+          <p><strong>Step 1:</strong> Enter a unique <b>Patient ID</b>. This identifier is used to label and store the simulation data. It is recommended to use a combination of letters and numbers (e.g., "Patient123") to ensure uniqueness.</p>
+          <p><strong>Step 2:</strong> Choose a <b>start time</b> for the simulation. The start time determines when the simulation begins and is used to schedule the simulation intervals. Please enter the time in the format <em>HH:MM:SS</em> (e.g., "08:00:00").</p>
+          <p><strong>Step 3:</strong> Select the <b>patient condition</b>. Depending on your simulation mode, the available condition options will change. For preterm simulation, only a healthy condition is available. For neonate simulation, you can choose between unhealthy conditions such as Bradycardia, Tachycardia, or a combination of both.</p>
+          <p><strong>Step 4:</strong> Set <b>Age</b>, <b>Weight</b>, and <b>Gender</b>. The Age field dynamically changes based on the simulation mode: for preterm simulation, it represents the post-conceptual age in weeks/days; for neonate simulation, it represents the age in days. Weight is selected in kilograms, and Gender is chosen from the available options.</p>
+          <p><strong>Step 5:</strong> Use the dropdown to select which <b>interventions</b> to simulate. By default, all interventions (e.g., feeding, medication, diaper change, etc.) are selected. These simulate routine NICU care and can be adjusted based on your testing needs.</p>
+          <p><strong>Step 6:</strong> Click <b>Run Simulation</b> to generate the simulation data. The output includes JSON and CSV files, along with a full data ZIP download option.</p>
+          <p><strong>Additional Tips:</strong> Ensure all required fields are filled correctly. If errors occur, verify that your inputs (especially start time and age) follow the proper format. Use a unique Patient ID for each simulation to avoid data conflicts.</p>
+          <p><strong>Troubleshooting:</strong> If the simulation fails to run, check that your browser allows form submissions and there are no network issues. For further assistance, please contact <a href="mailto:Gurshanriarh@cmail.carleton.ca">Gurshanriarh@cmail.carleton.ca</a>.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 
+    =============================================================================
+    External JavaScript
+    =============================================================================
+    Bootstrap bundle and custom main.js are loaded here.
+  -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    // On DOM load, update dropdowns, set hidden fields, and initialize tooltips/popovers.
+    document.addEventListener("DOMContentLoaded", function() {
+      var simulationMode = getSimulationMode();
+      // Set hidden simulation_mode value for backend processing
+      document.getElementById('simulation_mode').value = simulationMode;
+      
+      updateAgeDropdown();
+      updateConditionDropdown();
+      
+      if (simulationMode === "preterm") {
+        document.querySelector("label[for='Age']").textContent = "Post-Conceptual Age";
+        document.getElementById("condition_hidden").value = "none";
+      } else {
+        document.querySelector("label[for='Age']").textContent = "Age (days)";
+        var hiddenCond = document.getElementById("condition_hidden");
+        if (hiddenCond) {
+          hiddenCond.remove();
+        }
+      }
+      
+      // Update the card title based on simulation mode
+      var titleElem = document.querySelector(".card-header .card-title");
+      if(simulationMode === "preterm") {
+        titleElem.textContent = "Patient Simulation Setup (Preterm Simulation)";
+      } else {
+        titleElem.textContent = "Patient Simulation Setup (Neonate Simulation)";
+      }
+      
+      // Initialize tooltips on all elements with data-bs-toggle="tooltip"
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+      
+      // Initialize popovers on elements with data-bs-toggle="popover"
+      var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+      popoverTriggerList.forEach(function(popoverTriggerEl) {
+        new bootstrap.Popover(popoverTriggerEl);
+      });
+    });
+  </script>
+</body>
+</html>

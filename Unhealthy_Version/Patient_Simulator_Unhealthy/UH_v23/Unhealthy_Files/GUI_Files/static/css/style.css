@@ -1,0 +1,209 @@
+/* =============================================================================
+   NICU Patient Simulator - Custom Stylesheet
+   This stylesheet defines the overall look and feel for the NICU Patient Simulator,
+   including background settings, typography, layout for navigation, forms, and result pages.
+============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   Global Body Styles
+----------------------------------------------------------------------------- */
+/* Set background image for the entire page along with basic typography and layout */
+body {
+    background-image: url('/static/img/NICU_ENVIRONMENT.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* -----------------------------------------------------------------------------
+   Navbar Styles
+----------------------------------------------------------------------------- */
+/* Add subtle shadow to the navbar and adjust brand positioning */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.navbar .navbar-brand {
+    margin-left: 0 !important;
+    padding-left: 15px; /* Ensures the brand touches the left edge */
+}
+
+/* -----------------------------------------------------------------------------
+   Card and Form Styles
+----------------------------------------------------------------------------- */
+/* Patient Simulation Setup Card: dark gray background with white text */
+.card {
+    background-color: #6a6c6e !important; /* Dark gray */
+    color: white !important; /* Ensure text is white */
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+/* Card header styling to match the card theme */
+.card-header {
+    background-color: #5a5c5e !important;
+    color: white !important;
+}
+
+/* Form fields and dropdowns: white background for inputs, with black text */
+.form-control, .form-select {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid #ccc;
+}
+/* Labels are forced to white */
+.form-label {
+    color: white !important;
+}
+/* Input group text (icons) are styled with white background and black text */
+.input-group-text {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid #ccc;
+}
+/* Focus state styling for form controls */
+.form-control:focus, .form-select:focus {
+    border-color: #4f5052 !important;
+    box-shadow: none;
+}
+
+/* Centering the simulation setup container */
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+/* -----------------------------------------------------------------------------
+   Footer Styles
+----------------------------------------------------------------------------- */
+/* Footer stays at the bottom and matches the overall color theme */
+.footer {
+    margin-top: auto;
+    width: 100%;
+    background-color: #6a6c6e;
+    padding: 10px 0;
+    text-align: center;
+    position: relative;
+}
+
+/* -----------------------------------------------------------------------------
+   Result Page Layout Styles
+----------------------------------------------------------------------------- */
+/* Container for result page ensures full height */
+.result-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+/* Cards within result container grow to push footer to bottom */
+.result-container .card {
+    flex-grow: 1;
+}
+/* Force text elements inside results to be white */
+.result-container h1,
+.result-container h2,
+.result-container h3,
+.result-container h4,
+.result-container h5,
+.result-container h6,
+.result-container p,
+.result-container span,
+.result-container label {
+    color: white !important;
+}
+/* Ensure tables in results have white text */
+.result-container table {
+    color: white !important;
+}
+/* Light table borders for improved visibility */
+.result-container table, 
+.result-container th, 
+.result-container td {
+    border: 1px solid #ddd;
+}
+
+/* -----------------------------------------------------------------------------
+   Button and Download Link Styles
+----------------------------------------------------------------------------- */
+/* Style for download buttons: white text, transparent background */
+.result-container .btn-outline-primary {
+    color: white !important;
+    border-color: white !important;
+    background-color: transparent !important;
+    transition: all 0.3s ease-in-out;
+}
+/* Hover effect: adds a subtle white glow */
+.result-container .btn-outline-primary:hover,
+.result-container .btn-outline-primary:focus,
+.result-container .btn-outline-primary:active {
+    color: white !important;
+    border-color: white !important;
+    background-color: transparent !important;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+/* Force icons within buttons to be white */
+.result-container .btn-outline-primary i {
+    color: white !important;
+}
+/* Ensure all buttons display white text when not hovered */
+.result-container .btn:not(:hover),
+.result-container .btn-primary:not(:hover),
+.result-container .btn-secondary:not(:hover),
+.result-container .btn-outline-primary:not(:hover),
+.result-container a.btn:not(:hover),
+.result-container button.btn:not(:hover),
+.result-container input[type="button"]:not(:hover),
+.result-container input[type="submit"]:not(:hover),
+.result-container .btn-link:not(:hover) {
+    color: white !important;
+    border-color: white !important;
+    background-color: transparent !important;
+}
+/* Explicit targeting of all button types */
+.result-container a.btn,
+.result-container button.btn,
+.result-container input[type="button"],
+.result-container input[type="submit"],
+.result-container .btn-link {
+    color: white !important;
+}
+
+/* -----------------------------------------------------------------------------
+   Additional Utility Styles
+----------------------------------------------------------------------------- */
+/* Loading spinner, hidden by default */
+.spinner-border {
+    display: none;
+    margin-right: 8px;
+}
+/* Placeholder image for plots or other content */
+.placeholder-image {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+.placeholder-image img {
+    max-height: 380px;
+}
+/* Pulse animation for loading states */
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+.loading {
+    animation: pulse 1.5s infinite ease-in-out;
+}

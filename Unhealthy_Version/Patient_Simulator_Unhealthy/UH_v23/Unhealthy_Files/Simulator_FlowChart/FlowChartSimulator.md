@@ -1,0 +1,212 @@
+# NICU Patient Simulator v61
+
+- **Project Overview**
+  - **Purpose:** Simulate NICU patient data for both healthy (preterm) and unhealthy (neonate) scenarios.
+  - **Key Components:**
+    - Data generation using GANs
+    - Simulation logic for vital signs & interventions
+    - Data export (JSON, CSV)
+    - Visualization (static with Matplotlib, interactive with Plotly)
+    - Web interface using Flask
+
+- **Data Generation with GANs**
+  - **GAN Training Scripts:**
+    - **GAN_Resp_Normalized_TorchFast.py**
+      - **Data Preparation:**
+        - Load CSV with respiration rate data.
+        - Normalize data (range 30-70 breaths/min).
+      - **Model Architecture:**
+        - **Generator:**
+          - Input: noise_dim (10)
+          - Layers: Linear(10->64) → ReLU → BatchNorm → Linear(64->32) → ReLU → Linear(32->1) → Sigmoid
+        - **Discriminator:**
+          - Layers: Linear(1->32) → ReLU → Linear(32->16) → ReLU → Linear(16->1) → Sigmoid
+      - **Training Loop:**
+        - Loop for 5000 epochs with batch_size 16.
+        - Discriminator training: Calculate loss on real & fake data.
+        - Generator training: Generate noise, compute loss against real labels.
+      - **Output:**
+        - Save generator state dict as `trained_generator_ResprationRate_again.pth`
+    - **GAN_Heart_Normalized_TorchFast.py**
+      - Similar structure as respiration GAN
+      - **Data Preparation:**
+        - Load CSV for heart rate data.
+        - Normalize data (range 100-150 BPM).
+      - **Output:**
+        - Save generator state dict as `trained_generator_HeartRate_again.pth`
+    - **Bradycardia_GAN.py/Tachycardia_GAN.py**
+      - **Data Preparation:**
+        - Load BPM sequences from CSV.
+        - Normalize data based on the min and max in the data.
+      - **Model Architecture:**
+        - **Generator:** Outputs 96-point sequences representing an 8hr period at 5-min intervals.
+        - **Discriminator:** Processes 96-dimensional inputs.
+      - **Training and Output:**
+        - Trains for 5000 epochs.
+        - Saves synthetic data to CSV for further analysis.
+
+- **Simulation Modules**
+  - **Healthy Simulation (Preterm)**
+    - **NICU_Simulator_Parmas.py**
+      - **GAN Model Loading:**
+        - Loads heart rate and respiration GANs from the Trained_GAN_Path_Files directory.
+      - **Data Generation:**
+        - `generate_synthetic_data()`
+          - Accepts a generator, steps, normalization parameters, and output type.
+          - Generates noise, produces synthetic values, and optionally normalizes/scales.
+          - Applies Gaussian smoothing (sigma: 0.3 for HR, 0.6 for Resp).
+      - **Vital Sign Calculation:**
+        - `calculate_HR_Delta()`
+          - Iterates over heart rate data and calculates delta changes.
+        - `calculate_RespRate_Delta()`
+          - Computes absolute differences for respiration rates.
+      - **Intervention Scheduling:**
+        - **Feeding Schedule:**
+          - Based on gestational age (only if ≥34 weeks) and possible feeding intolerance.
+        - **Medication Schedule:**
+          - Based on condition "infection"; scheduled every 6 hours.
+        - **Diaper and Position Change Schedules:**
+          - Diaper changes every 3 hours; position changes every 4 hours.
+        - **Random Interventions:**
+          - Adjusted via Poisson rates and covariance matrix.
+      - **Simulation Loop (`simulate()`):**
+        - Iterates from `start_time` to `end_time` (shift_length in hours).
+        - Updates current state (awake/sleeping) based on time.
+        - For each interval:
+          - Generates vital signs by fetching the next GAN value.
+          - Computes body temperature and its delta.
+          - Schedules both fixed and random interventions.
+          - Determines pain level using thresholds on HR, respiratory rate, and temperature.
+          - Appends an entry with timestamp, vital signs, interventions, and pain level.
+      - **Data Export:**
+        - `export_data()`: Saves JSON file with patient details and simulation data.
+        - `export_gan_values()`: Exports CSV files for HR, respiration rate, deltas.
+        - `export_interventions()`: Exports intervention events as CSV.
+        - `validate_gan_values()`: Compares GAN-generated values with JSON entries.
+    - **PatientProfile (Healthy)**
+      - Contains gestational age (weeks/days), weight, and conditions.
+  
+  - **Unhealthy Simulation (Neonate)**
+    - **NICU_Simulator_Params_Unhealthy.py**
+      - **Extended GAN Loading:**
+        - Loads heart rate, bradycardia, and tachycardia generators.
+      - **Conditional Data Generation:**
+        - If both bradycardia and tachycardia:
+          - Uses base HR from healthy generator and injects random spikes:
+            - With 4% chance, choose spike duration (3-4 intervals).
+            - Randomly choose between bradycardia (100-110 BPM) and tachycardia (150-190 BPM).
+        - Else if only bradycardia or only tachycardia:
+          - Generates synthetic HR using the corresponding generator.
+        - Applies Gaussian smoothing with sigma adjustments.
+      - **Delta Calculation Adjustments:**
+        - Uses different thresholds (e.g., 20 or 30) based on condition.
+        - Scales the delta values when spikes are detected.
+      - **Intervention Scheduling:**
+        - Similar scheduling as healthy mode but using patient age (days) instead of gestational age.
+        - Adjusts intervention rates based on time of day (e.g., family visitation, lab tests).
+      - **Simulation Loop:**
+        - Follows a similar iterative process:
+          - Generates vital signs, schedules interventions, and calculates pain level.
+          - Each entry is timestamped and appended to the simulation data.
+      - **Data Export and Validation:**
+        - Exports JSON, CSV files (with specific filenames for bradycardia/tachycardia).
+        - Validates that the GAN-generated values match the exported JSON.
+
+- **Visualization Modules**
+  - **Static Visualization (Matplotlib)**
+    - **Vital_Sign_Static_Plots_Unhealthy.py**
+      - Reads the JSON file from patient data.
+      - Extracts:
+        - Timestamps (converted to datetime objects).
+        - Heart Rate, Respiratory Rate, Body Temperature.
+        - Delta values for heart rate, respiration rate, and temperature.
+      - Plots each using:
+        - Configured titles and y-axis limits based on conditions (normal, bradycardia, tachycardia).
+      - Saves PNG files in a `static_plots` directory.
+  - **Interactive Visualization (Plotly)**
+    - **Vital_Sign_Interactive_Plots_Unhealthy.py**
+      - Similar data extraction as static plots.
+      - Uses Plotly's `go.Scatter` to create interactive plots.
+      - Configures layout with dynamic tick labels and hover details.
+      - Saves HTML files in an `interactive_plots` directory.
+
+- **Web Application (Flask)**
+  - **ExecuteSimulation.py**
+    - **Path Setup:**
+      - Computes `PROJECT_ROOT` and inserts Healthy/Unhealthy paths into `sys.path`.
+    - **Imports:**
+      - Imports healthy simulator & profile from NICU_Simulator_Parmas.py.
+      - Imports unhealthy simulator & profile from NICU_Simulator_Params_Unhealthy.py.
+      - Imports visualization functions.
+    - **Flask Routes:**
+      - `/` – **Home Page:**
+        - Displays simulation mode selection (via *simulation_mode.html*).
+      - `/setup` – **Simulation Setup Form:**
+        - Loads *index.html* with dynamic dropdowns (Age, Condition, Interventions).
+      - `/simulate` – **Run Simulation:**
+        - **Input Processing:**
+          - Reads form data: patient_id, start_time, weight, gender, Age, condition, interventions.
+          - For neonate mode: parses age in days; for preterm: expects weeks/days.
+          - Determines simulation mode based on URL parameter (preterm vs neonate).
+          - Flags for bradycardia/tachycardia based on condition.
+        - **Simulator Instantiation:**
+          - For neonate mode, creates an UnhealthyProfile and corresponding simulator.
+          - For preterm mode, creates a HealthyProfile and simulator.
+        - **Simulation Execution:**
+          - Calls `simulate()`, `export_data()`, `export_gan_values()`, `export_interventions()`, and `validate_gan_values()`.
+        - **Visualization:**
+          - Triggers static and interactive plot generation.
+        - **Response:**
+          - Renders *result.html* with patient details and condition badges.
+      - **Download and Display Endpoints:**
+        - `/download/<patient_id>/<filename>` – Serves JSON, CSV, ZIP files.
+        - `/display_plot/<patient_id>/<plot_type>` – Serves individual interactive plot files.
+        - `/display_csv/<patient_id>/<csv_filename>` – Displays CSV content.
+        - `/display_json/<patient_id>` – Displays raw JSON data.
+    - **Error Handling:**
+      - Returns JSON error messages if simulation fails.
+
+- **Front-End Components**
+  - **HTML Templates:**
+    - *simulation_mode.html*: Mode selection with two buttons (Preterm, Neonate).
+    - *index.html*: Form with dynamic fields:
+      - Patient ID, start time, condition, Age (dynamic dropdown based on mode), Weight, Gender.
+      - Interventions selectable via a dropdown with checkboxes.
+    - *result.html*: Displays:
+      - Patient ID, condition badge, tabs for data files, JSON, visualizations, and CSV downloads.
+  - **CSS (style.css):**
+    - Sets a NICU-themed background (NICU_ENVIRONMENT.jpg).
+    - Styles navigation bar, cards, form controls, buttons, and footer.
+    - Ensures responsiveness and consistency across pages.
+  - **JavaScript:**
+    - *main.js*:
+      - Reads URL parameters to determine simulation mode.
+      - Dynamically populates Age and Condition dropdowns.
+      - Enhances form submission with a loading spinner.
+    - *result.js*:
+      - Handles tab navigation on the result page.
+      - Loads CSV and JSON content dynamically for in-page viewing.
+  
+- **Data Output & Validation**
+  - **Output Files:**
+    - **JSON:** Contains patient details and a list of simulation entries with timestamp, vital signs, interventions, and pain level.
+    - **CSV Files:**
+      - GAN-generated values for heart rate, respiratory rate.
+      - Calculated delta values for HR and respiration rate.
+      - Interventions log.
+  - **Validation:**
+    - Checks that the sequence of GAN-generated values matches the values recorded in the JSON output.
+    - Prints success or error messages to the console.
+
+- **Overall Data Flow**
+  - **User Interaction → Input Form**
+    - User selects simulation mode, fills patient details and interventions.
+  - **Simulation Execution**
+    - Appropriate simulator (Healthy/Unhealthy) is instantiated.
+    - GAN models generate synthetic vital signs.
+    - Simulation loop calculates deltas, schedules interventions, and computes pain level.
+  - **Data Export & Visualization**
+    - Simulation data is exported to JSON/CSV.
+    - Static and interactive plots are generated.
+  - **Web Interface**
+    - Flask routes serve result pages, downloads, and dynamic data displays.
