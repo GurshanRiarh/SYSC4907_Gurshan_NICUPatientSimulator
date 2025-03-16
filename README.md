@@ -9,7 +9,7 @@ Visualization: Includes static and interactive plots for vital signs.
 Web Interface: Flask-based UI for setting up and running simulations.
 
 Installation: 
-1. Clone the repository: git clone https://github.com/your-username/NICU-Patient-Simulator.git cd NICU-Patient-Simulator
+1. Clone the repository: git clone https://github.com/GurshanRiarh/NICU-Patient-Simulator.git cd NICU-Patient-Simulator
 2. Install dependencies: pip install -r requirements.txt
 
 Usage: 
