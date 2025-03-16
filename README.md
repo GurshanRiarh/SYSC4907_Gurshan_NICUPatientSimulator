@@ -1,12 +1,12 @@
 The NICU Patient Simulator is a simulation tool for neonatal intensive care units, designed to generate synthetic vital sign data, model interventions, and provide visualization tools for analysis. The simulator supports both healthy and unhealthy neonates, allowing for the study of conditions like bradycardia and tachycardia.
 
 Features: 
-Synthetic Data Generation: Uses GAN-based models to generate heart rate and respiratory rate data.
-Simulation Modes: Supports preterm and neonate simulations with various conditions.
-Patient Monitoring: Models interventions like feeding, medication, and oxygen administration.
-Data Export: Outputs simulation results in JSON and CSV formats.
-Visualization: Includes static and interactive plots for vital signs.
-Web Interface: Flask-based UI for setting up and running simulations.
+1. Synthetic Data Generation: Uses GAN-based models to generate heart rate and respiratory rate data.
+2. Simulation Modes: Supports preterm and neonate simulations with various conditions.
+3. Patient Monitoring: Models interventions like feeding, medication, and oxygen administration.
+4. Data Export: Outputs simulation results in JSON and CSV formats.
+5. Visualization: Includes static and interactive plots for vital signs.
+6. Web Interface: Flask-based UI for setting up and running simulations.
 
 Installation: 
 1. Clone the repository: git clone https://github.com/GurshanRiarh/NICU-Patient-Simulator.git cd NICU-Patient-Simulator
