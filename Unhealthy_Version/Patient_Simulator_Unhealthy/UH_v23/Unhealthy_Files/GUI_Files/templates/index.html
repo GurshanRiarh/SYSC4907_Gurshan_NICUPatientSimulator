@@ -122,9 +122,12 @@
     }
     /* Constrain the height and enable scrolling */
     .dropdown-menu.p-3 {
-      max-height: 300px; /* Adjust as needed */
-      overflow-y: auto;
-    }
+      max-height: 200px !important; /* Remove fixed height */
+      overflow-y: auto !important; /* Ensure all options are visible */
+  }
+
+
+
     /* Center each checkbox + label pair */
     .dropdown-menu .form-check {
       display: flex;
@@ -144,8 +147,8 @@
     =============================================================================
     Navigation Bar
     =============================================================================
-    The navigation bar provides a link to return to the simulation mode selection 
-    page and includes a help button with tooltip.
+    The navigation bar provides a link to return to simulation mode selection 
+    and includes a help button with tooltip.
   -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
@@ -177,7 +180,7 @@
           <input type="hidden" name="simulation_mode" id="simulation_mode" value="">
           <div class="row">
             <div class="col-md-6 mb-3">
-              <!-- Patient ID input with tooltip -->
+              <!-- Added tooltip to Patient ID label -->
               <label for="patient_id" class="form-label" data-bs-toggle="tooltip" title="Enter a unique patient identifier">Patient ID</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-id-card"></i></span>
@@ -191,7 +194,7 @@
               </div>
             </div>
             <div class="col-md-6 mb-3">
-              <!-- Start Time dropdown with tooltip -->
+              <!-- Added tooltip to Start Time label -->
               <label for="start_time" class="form-label" data-bs-toggle="tooltip" title="Select the simulation start time (HH:MM:SS)">Start Time (HH:MM:SS)</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="far fa-clock"></i></span>
@@ -216,7 +219,7 @@
           -->
           <div class="row">
             <div class="col-md-6 mb-3">
-              <!-- Condition dropdown with tooltip -->
+              <!-- Added tooltip to Condition label -->
               <label for="condition" class="form-label" data-bs-toggle="tooltip" title="Choose the patient condition. Options adjust based on simulation mode">Patient Condition</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-heartbeat"></i></span>
@@ -233,16 +236,16 @@
                   <option value="both">Bradycardia & Tachycardia</option>
                 </select>
               </div>
-              <!-- Hidden input to ensure condition is submitted when the select is disabled -->
+              <!-- Added hidden input to ensure condition is submitted when the select is disabled -->
               <input type="hidden" name="condition" id="condition_hidden" value="">
             </div>
             <div class="col-md-6 mb-3">
-              <!-- Age dropdown with tooltip (will be populated dynamically) -->
+              <!-- Added tooltip to Age label -->
               <label for="Age" class="form-label" data-bs-toggle="tooltip" title="For preterm simulation: post-conceptual age (weeks/days); for neonate simulation: age in days">Age</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                 <select id="Age" name="Age" class="form-select" required>
-                  <!-- Options populated via JavaScript -->
+                  <!-- This will be populated dynamically -->
                 </select>
               </div>
             </div>
@@ -254,9 +257,12 @@
             =============================================================================
             A custom dropdown for selecting which interventions to simulate. It mimics the 
             style of a form-select and provides a scrollable list of checkboxes.
+            NOTE: Intervention checkboxes are now initialized without "checked" so that they
+            start unselected. Additionally, "Select All" and "Deselect All" buttons are added.
           -->
           <div class="dropdown mb-3">
-            <label for="interventionDropdown" class="form-label" data-bs-toggle="tooltip" title="Select the interventions you want to simulate. All options are selected by default.">
+            <!-- Changed data-bs-toggle attribute from "popover" to "dropdown" for proper dropdown functionality; tooltip remains via title -->
+            <label for="interventionDropdown" class="form-label" data-bs-toggle="tooltip" title="Select the interventions you want to simulate.">
               Interventions
             </label>
             <button
@@ -265,14 +271,17 @@
               id="interventionDropdown"
               data-bs-toggle="dropdown"
               aria-expanded="false"
-              title="Select interventions to simulate. All options are selected by default."
+              title="Select interventions to simulate."
             >
               Select Interventions to Simulate
             </button>
-            <div
-              class="dropdown-menu p-3"
-              aria-labelledby="interventionDropdown"
-            >
+            <div class="dropdown-menu p-3" aria-labelledby="interventionDropdown">
+              <!-- Added Select All / Deselect All buttons -->
+              <div class="d-flex justify-content-between mb-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllBtn">Select All</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllBtn">Deselect All</button>
+              </div>
+              <!-- Intervention checkboxes start unselected -->
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="interventions" id="feeding" value="feeding" checked />
                 <label class="form-check-label" for="feeding">Feeding</label>
@@ -315,7 +324,7 @@
               </div>
             </div>
           </div>
-          <!-- End of Intervention Dropdown -->
+          <!-- End Intervention Dropdown -->
 
           <!-- 
             =============================================================================
@@ -324,7 +333,7 @@
           -->
           <div class="row">
             <div class="col-md-6 mb-3">
-              <!-- Weight selection with tooltip -->
+              <!-- Added tooltip to Weight label -->
               <label for="weight" class="form-label" data-bs-toggle="tooltip" title="Select the patient weight in kg">Weight (kg)</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-weight"></i></span>
@@ -336,8 +345,8 @@
               </div>
             </div>
             <div class="col-md-6 mb-3">
-              <!-- Gender selection with tooltip -->
-              <label for="gender" class="form-label" data-bs-toggle="tooltip" title="Select the patient gender">Gender</label>
+              <!-- Added tooltip to Gender label -->
+              <label for="gender" class="form-label" data-bs-toggle="tooltip" title="Select the patient sex">Sex</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
                 <select id="gender" name="gender" class="form-select" required>
@@ -408,18 +417,27 @@
       </div>
     </div>
   </div>
-
+  
   <!-- 
     =============================================================================
     External JavaScript
     =============================================================================
-    Bootstrap bundle and custom main.js are loaded here.
+    Bootstrap JS Bundle with Popper and custom main.js are loaded here.
   -->
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
   ></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.dropdown-menu').forEach(function (dropdown) {
+        dropdown.addEventListener('click', function (event) {
+          event.stopPropagation();
+        });
+      });
+    });
+  
+
     // On DOM load, update dropdowns, set hidden fields, and initialize tooltips/popovers.
     document.addEventListener("DOMContentLoaded", function() {
       var simulationMode = getSimulationMode();
@@ -459,6 +477,29 @@
       popoverTriggerList.forEach(function(popoverTriggerEl) {
         new bootstrap.Popover(popoverTriggerEl);
       });
+      
+      // New: Uncheck all intervention checkboxes on page load.
+      const interventionCheckboxes = document.querySelectorAll('input[name="interventions"]');
+      interventionCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      
+      // New: Add event listeners for Select All / Deselect All buttons
+      const selectAllBtn = document.getElementById('selectAllBtn');
+      const deselectAllBtn = document.getElementById('deselectAllBtn');
+      
+      if(selectAllBtn && deselectAllBtn) {
+        selectAllBtn.addEventListener('click', function() {
+          interventionCheckboxes.forEach(checkbox => {
+            checkbox.checked = true;
+          });
+        });
+        deselectAllBtn.addEventListener('click', function() {
+          interventionCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+          });
+        });
+      }
     });
   </script>
 </body>

@@ -39,7 +39,7 @@ print("sys.path:", sys.path)
 # =============================================================================
 # Module Imports
 # =============================================================================
-from NICU_Simulator_Parmas import NeonateSimulator as HealthySimulator, PatientProfile as HealthyProfile
+from NICU_Simulator_Parmas import NeonateSimulator as HealthySimulator, PatientProfile as HealthyProfile # type: ignore
 from NICU_Simulator_Params_Unhealthy import NeonateSimulator as UnhealthySimulator, PatientProfile as UnhealthyProfile
 from Vital_Sign_Static_Plots_Unhealthy import plot_vital_signs
 from Vital_Sign_Interactive_Plots_Unhealthy import plot_interactive_vital_signs

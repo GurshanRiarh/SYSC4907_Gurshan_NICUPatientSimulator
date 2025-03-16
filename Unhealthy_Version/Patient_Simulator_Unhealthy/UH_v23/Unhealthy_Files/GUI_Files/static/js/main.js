@@ -8,15 +8,15 @@
 // =============================================================================
 
 // -----------------------------------------------------------------------------
- // Helper Function: getSimulationMode
- // Reads the "mode" parameter from the URL and returns its value.
- // Defaults to 'preterm' if not specified.
- // -----------------------------------------------------------------------------
- function getSimulationMode() {
+// Helper Function: getSimulationMode
+// Reads the "mode" parameter from the URL and returns its value.
+// Defaults to 'preterm' if not specified.
+// -----------------------------------------------------------------------------
+function getSimulationMode() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('mode') || 'preterm';
 }
-
+  
 // -----------------------------------------------------------------------------
 // Function: updateAgeDropdown
 // Populates the Age dropdown based on the current simulation mode.
@@ -48,7 +48,7 @@ function updateAgeDropdown() {
       }
   }
 }
-
+  
 // -----------------------------------------------------------------------------
 // Function: updateConditionDropdown
 // Dynamically populates the Condition dropdown based on the simulation mode.
@@ -115,6 +115,33 @@ document.addEventListener('DOMContentLoaded', function() {
     helpBtn.addEventListener('click', function() {
       const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
       helpModal.show();
+    });
+  }
+  
+  // ---------------------------------------------------------------------------
+  // New Section: Intervention Checkbox Control
+  // This section adds functionality for "Select All" and "Deselect All" buttons
+  // for intervention checkboxes (if they exist on the page).
+  // ---------------------------------------------------------------------------
+  const interventionCheckboxes = document.querySelectorAll('input[name="interventions"]');
+  // Initially uncheck all intervention checkboxes
+  interventionCheckboxes.forEach(checkbox => {
+    checkbox.checked = false;
+  });
+
+  const selectAllBtn = document.getElementById('selectAllBtn');
+  const deselectAllBtn = document.getElementById('deselectAllBtn');
+
+  if(selectAllBtn && deselectAllBtn) {
+    selectAllBtn.addEventListener('click', function() {
+      interventionCheckboxes.forEach(checkbox => {
+        checkbox.checked = true;
+      });
+    });
+    deselectAllBtn.addEventListener('click', function() {
+      interventionCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+      });
     });
   }
 });
