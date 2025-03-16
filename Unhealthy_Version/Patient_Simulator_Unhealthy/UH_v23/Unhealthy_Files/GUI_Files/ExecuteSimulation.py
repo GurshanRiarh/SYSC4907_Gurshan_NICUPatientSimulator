@@ -22,7 +22,7 @@ from threading import Timer
 # Directory Setup and Path Insertion
 # =============================================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# PROJECT_ROOT is two levels up from this file (e.g., UH_v21)
+# PROJECT_ROOT is two levels up from this file (e.g., UH_vxx)
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
 
 # Paths for simulation modules
