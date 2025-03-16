@@ -9,7 +9,7 @@ Features:
 6. Web Interface: Flask-based UI for setting up and running simulations.
 
 Installation: 
-1. Clone the repository: git clone https://github.com/GurshanRiarh/NICU-Patient-Simulator.git cd NICU-Patient-Simulator
+1. Clone the repository: git clone [https://github.com/GurshanRiarh/NICU-Patient-Simulator.git](https://github.com/GurshanRiarh/SYSC4907_Gurshan_NICUPatientSimulator.git) cd NICU-Patient-Simulator
 2. Install dependencies: pip install -r requirements.txt
 
 Usage: 
