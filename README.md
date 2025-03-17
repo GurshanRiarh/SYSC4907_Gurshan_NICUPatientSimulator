@@ -36,7 +36,7 @@ The system uses **pre-trained GAN (Generative Adversarial Network) models** to g
 ## Project Structure
 
 A simplified overview of the primary files and folders:
-
+```
 Project/
 │
 ├── ExecuteSimulation.py
